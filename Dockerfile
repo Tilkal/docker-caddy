@@ -20,6 +20,9 @@ ENV PLATFORM alpine
 ENV GO_VERSION 1.8.1
 ENV CADDY_VERSION v0.10.2
 
+RUN apk --update --no-cache add ca-certificates \
+  && update-ca-certificates
+
 COPY --from=gobuilder /go/bin/caddy-with-jwt-${PLATFORM} /opt/bin/caddy
 
 WORKDIR /opt/bin
