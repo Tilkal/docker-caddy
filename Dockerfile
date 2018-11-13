@@ -4,14 +4,15 @@ ENV PLATFORM alpine
 
 RUN apk --update --no-cache add git bash \
     && go get -d github.com/sgaide/caddy-jwt \
+    && go get -d github.com/caddyserver/dnsproviders/gandiv5 \
     && go get -d github.com/mholt/caddy/caddy \
     && cd /go/src/github.com/mholt/caddy/caddy \
-    && sed -i '/\/\/ This is where other plugins get plugged in (imported)/c\_ "github.com/sgaide/caddy-jwt"' caddymain/run.go \
+    && sed -i '/\/\/ This is where other plugins get plugged in (imported)/c\_ "github.com/sgaide/caddy-jwt"\n_ "github.com/caddyserver/dnsproviders/gandiv5"' caddymain/run.go \
     && go get github.com/caddyserver/builds \
     && go run build.go \
     && mv caddy /go/bin/caddy-with-jwt-${PLATFORM}
 
-FROM alpine:3.5
+FROM alpine:3.8
 
 ENV PLATFORM alpine
 
