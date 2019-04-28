@@ -1,25 +1,24 @@
-FROM golang:1.10-alpine as gobuilder
+FROM golang:1.12-alpine as gobuilder
 
 ENV PLATFORM alpine
+ENV GO111MODULE on
+
+COPY caddy-build.go /opt/go/caddy-build/caddy-build.go
 
 RUN apk --update --no-cache add git bash \
-    && go get -d github.com/sgaide/caddy-jwt \
-    && go get -d github.com/caddyserver/dnsproviders/gandiv5 \
-    && go get -d github.com/mholt/caddy/caddy \
-    && cd /go/src/github.com/mholt/caddy/caddy \
-    && sed -i '/\/\/ This is where other plugins get plugged in (imported)/c\_ "github.com/sgaide/caddy-jwt"\n_ "github.com/caddyserver/dnsproviders/gandiv5"' caddymain/run.go \
-    && go get github.com/caddyserver/builds \
-    && go run build.go \
-    && mv caddy /go/bin/caddy-with-jwt-${PLATFORM}
+    && cd /opt/go/caddy-build/ \
+    && go mod init caddy \
+    && go get github.com/mholt/caddy \
+    && go build
 
-FROM alpine:3.8
+FROM alpine:3.9
 
 ENV PLATFORM alpine
 
 RUN apk --update --no-cache add ca-certificates \
   && update-ca-certificates
 
-COPY --from=gobuilder /go/bin/caddy-with-jwt-${PLATFORM} /opt/bin/caddy
+COPY --from=gobuilder /opt/go/caddy-build/caddy /opt/bin/caddy
 
 WORKDIR /opt/bin
 EXPOSE 443
