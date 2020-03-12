@@ -1,14 +1,10 @@
-FROM golang:1.12-alpine as gobuilder
-
-ENV PLATFORM alpine
-ENV GO111MODULE on
+FROM golang:1.13-alpine as gobuilder
 
 COPY caddy-build.go /opt/go/caddy-build/caddy-build.go
 
-RUN apk --update --no-cache add git bash \
-    && cd /opt/go/caddy-build/ \
+RUN cd /opt/go/caddy-build/ \
     && go mod init caddy \
-    && go get github.com/mholt/caddy \
+    && go get github.com/caddyserver/caddy \
     && go build
 
 FROM alpine:3.9
